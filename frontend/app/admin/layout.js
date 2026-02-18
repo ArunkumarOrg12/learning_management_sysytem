@@ -31,8 +31,13 @@ export default function AdminLayout({ children }) {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/login");
+    router.push("/admin/login");
   };
+
+  // The /admin/login page lives inside the admin folder but must render freely
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
@@ -47,7 +52,7 @@ export default function AdminLayout({ children }) {
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", gap: 16, background: "var(--background)" }}>
         <h2 style={{ fontSize: 20, fontWeight: 600 }}>Access Denied</h2>
         <p style={{ color: "var(--foreground-muted)" }}>You must be an admin to access this area.</p>
-        <Link href="/login" className="btn btn-primary">Sign In</Link>
+        <Link href="/admin/login" className="btn btn-primary">Admin Sign In</Link>
       </div>
     );
   }

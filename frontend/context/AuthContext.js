@@ -12,6 +12,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     checkAuth();
+    // Show any session-invalidation message stored by the API interceptor
+    const msg = sessionStorage.getItem("auth_message");
+    if (msg) {
+      toast.error(msg);
+      sessionStorage.removeItem("auth_message");
+    }
   }, []);
 
   const checkAuth = async () => {
@@ -27,6 +33,9 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Student login — backend rejects admin accounts.
+   */
   const login = async (email, password) => {
     try {
       const { data } = await authAPI.login({ email, password });
@@ -37,6 +46,23 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
+      throw error;
+    }
+  };
+
+  /**
+   * Admin login — backend rejects student accounts.
+   */
+  const adminLogin = async (email, password) => {
+    try {
+      const { data } = await authAPI.adminLogin({ email, password });
+      if (data.success) {
+        setUser(data.user);
+        toast.success(`Welcome back, ${data.user.name}!`);
+        return data.user;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Admin login failed");
       throw error;
     }
   };
@@ -58,15 +84,18 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await authAPI.logout();
+    } catch {
+      // Even if the request fails, clear local state
+    } finally {
       setUser(null);
       toast.success("Logged out");
-    } catch {
-      setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, adminLogin, register, logout, checkAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );
