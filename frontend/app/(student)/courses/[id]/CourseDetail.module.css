@@ -1,0 +1,74 @@
+.container {
+  padding: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+}
+
+.videoContainer {
+  background: #000;
+  aspect-ratio: 16/9;
+  max-height: 500px;
+  position: relative;
+  width: 100%;
+}
+
+.mainContent {
+  min-width: 0; /* Prevent overflow */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.sidebar {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+}
+
+/* Tablet & Mobile Styles */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr; /* Stack vertically */
+  }
+
+  .sidebar {
+    position: relative; /* Unstick on mobile/tablet if needed, or keep sticky if height allows */
+    top: 0;
+    order: 2; /* Move to bottom if desired, or keep at top. Usually bottom for course content list on mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .videoContainer {
+    max-height: 300px;
+  }
+}

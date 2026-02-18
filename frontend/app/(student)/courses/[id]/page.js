@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { courseAPI, progressAPI, ratingAPI, chatAPI } from "@/lib/api";
 import toast from "react-hot-toast";
 import {
-  HiOutlinePlay, HiOutlineCheck, HiOutlineStar,
+  HiOutlinePlay, HiOutlineCheck, 
   HiOutlineChatBubbleLeftRight, HiOutlineChevronDown, HiOutlineChevronRight,
 } from "react-icons/hi2";
 import { IoSend } from "react-icons/io5";
+import styles from "./CourseDetail.module.css";
 
 export default function CourseDetailPage() {
   const { id } = useParams();
@@ -182,7 +183,7 @@ export default function CourseDetailPage() {
   return (
     <div style={{ padding: "0 0 80px" }}>
       {/* Video Player */}
-      <div style={{ background: "#000", aspectRatio: "16/9", maxHeight: 500, position: "relative" }}>
+      <div className={styles.videoContainer}>
         {activeVideo ? (
           <iframe
             src={`https://www.youtube.com/embed/${extractVideoId(activeVideo.youtubeUrl)}?rel=0`}
@@ -198,13 +199,13 @@ export default function CourseDetailPage() {
         )}
       </div>
 
-      <div className="container" style={{ padding: "24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 32 }}>
+      <div className={`container ${styles.container}`}>
+        <div className={styles.grid}>
           {/* Left: Details */}
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+          <div className={styles.mainContent}>
+            <div className={styles.header}>
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em" }}>{course.title}</h1>
+                <h1 className={styles.title}>{course.title}</h1>
                 <p style={{ color: "var(--foreground-muted)", fontSize: 14, marginTop: 4 }}>
                   by {course.instructor} · {course.category}
                 </p>
@@ -241,7 +242,7 @@ export default function CourseDetailPage() {
             )}
 
             {/* Tabs */}
-            <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border-light)", marginBottom: 24 }}>
+            <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border-light)", marginBottom: 24, overflowX: "auto" }}>
               {["content", "ratings", "doubts"].map((t) => (
                 <button
                   key={t}
@@ -250,6 +251,7 @@ export default function CourseDetailPage() {
                     borderBottom: tab === t ? "2px solid var(--foreground)" : "2px solid transparent",
                     borderRadius: 0, fontWeight: tab === t ? 600 : 400,
                     color: tab === t ? "var(--foreground)" : "var(--foreground-muted)",
+                    whiteSpace: "nowrap"
                   }}
                   onClick={() => setTab(t)}
                 >
@@ -404,7 +406,7 @@ export default function CourseDetailPage() {
           </div>
 
           {/* Right: Module Sidebar */}
-          <aside style={{ position: "sticky", top: 80, alignSelf: "start" }}>
+          <aside className={styles.sidebar}>
             <div className="card" style={{ padding: 0, overflow: "hidden" }}>
               <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-light)" }}>
                 <h3 style={{ fontSize: 15, fontWeight: 600 }}>Course Content</h3>
