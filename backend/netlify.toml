@@ -1,0 +1,29 @@
+[build]
+  command = "npm install"
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["**"]
+
+[dev]
+  command = "npm run dev"
+  port = 5000
+
+# All /api/* requests → serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Environment variables — set these in Netlify dashboard:
+# MONGO_URI
+# JWT_SECRET
+# JWT_REFRESH_SECRET
+# ACCESS_TOKEN_EXPIRE = 15m
+# REFRESH_TOKEN_EXPIRE = 7d
+# CLIENT_URL = https://your-frontend.netlify.app
+# NODE_ENV = production
+# RAZORPAY_KEY_ID
+# RAZORPAY_KEY_SECRET

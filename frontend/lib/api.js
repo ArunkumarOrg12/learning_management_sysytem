@@ -1,18 +1,102 @@
 import axios from "axios";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  baseURL: BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// ─── Auto-Refresh Interceptor ─────────────────────────────────────────────────
+// On any 401 with code TOKEN_EXPIRED, silently call /auth/refresh and retry once.
+// On SESSION_INVALIDATED or refresh failure, redirect to the appropriate login page.
+
+let isRefreshing = false;
+let failedQueue = []; // queue of { resolve, reject } for concurrent requests during refresh
+
+const processQueue = (error) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+  failedQueue = [];
+};
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    const data = error.response?.data;
+
+    // Don't retry refresh calls themselves to avoid infinite loops
+    if (originalRequest.url?.includes("/auth/refresh")) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && data?.code === "TOKEN_EXPIRED" && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Queue this request until the refresh completes
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => api(originalRequest))
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        await axios.post(`${BASE_URL}/auth/refresh`, {}, { withCredentials: true });
+        processQueue(null);
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError);
+        // Refresh failed — redirect to appropriate login
+        redirectToLogin();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    // Session invalidated by a new login elsewhere
+    if (error.response?.status === 401 && data?.code === "SESSION_INVALIDATED") {
+      redirectToLogin(data.message);
+      return Promise.reject(error);
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+function redirectToLogin(message) {
+  if (typeof window === "undefined") return;
+  const isAdminPath = window.location.pathname.startsWith("/admin");
+  const loginPath = isAdminPath ? "/admin/login" : "/login";
+  if (!window.location.pathname.includes("/login")) {
+    if (message) {
+      sessionStorage.setItem("auth_message", message);
+    }
+    window.location.href = loginPath;
+  }
+}
+
+// ─── API Modules ──────────────────────────────────────────────────────────────
+
 // Auth
 export const authAPI = {
   register: (data) => api.post("/auth/register", data),
-  login: (data) => api.post("/auth/login", data),
+  login: (data) => api.post("/auth/login", data),          // students only
+  adminLogin: (data) => api.post("/auth/admin/login", data), // admins only
   logout: () => api.post("/auth/logout"),
+  refresh: () => api.post("/auth/refresh"),
   getMe: () => api.get("/auth/me"),
 };
 

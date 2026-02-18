@@ -50,6 +50,18 @@ const userSchema = new mongoose.Schema(
       },
       expiresAt: Date,
     },
+    // Single-session enforcement: rotated on every login
+    sessionToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    // Hashed refresh token stored for validation
+    refreshToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
   },
   { timestamps: true }
 );
