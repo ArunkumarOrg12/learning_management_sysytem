@@ -1,0 +1,196 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.03em;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navLink {
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--foreground-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.navLink:hover {
+  color: var(--foreground);
+  background: var(--accent);
+}
+
+.navLink.active {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--foreground-secondary);
+  transition: all var(--transition-fast);
+}
+
+.iconBtn:hover {
+  color: var(--foreground);
+  background: var(--accent);
+}
+
+.profileMenu {
+  position: relative;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #333, #555);
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.avatar:hover {
+  box-shadow: 0 0 0 2px var(--foreground-muted);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  display: none;
+  animation: slideDown 200ms ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.profileMenu:hover .dropdown {
+  display: block;
+}
+
+.dropdownName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  padding: 4px 8px;
+  display: block;
+}
+
+.dropdownEmail {
+  font-size: 12px;
+  color: var(--foreground-muted);
+  padding: 0 8px 4px;
+  display: block;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px;
+  font-size: 14px;
+  color: var(--foreground-secondary);
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dropdownItem:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--foreground);
+  padding: 4px;
+}
+
+@media (max-width: 768px) {
+  .navLinks {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    padding: 16px;
+    display: none;
+  }
+
+  .navLinks.open {
+    display: flex;
+  }
+
+  .navLink {
+    width: 100%;
+    padding: 12px 16px;
+  }
+
+  .menuToggle {
+    display: flex;
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

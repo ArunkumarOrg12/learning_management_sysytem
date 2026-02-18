@@ -1,0 +1,153 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--background-secondary);
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.03em;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.nav {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--foreground-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.navItem:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.navItem.active {
+  background: var(--accent);
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.sidebarFooter {
+  padding: 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #333, #555);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.userName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.userRole {
+  font-size: 11px;
+  color: var(--foreground-muted);
+}
+
+.logoutBtn {
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.logoutBtn:hover {
+  color: var(--error);
+  background: var(--error-bg);
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 64px;
+  }
+
+  .logo span,
+  .navItem span,
+  .userName,
+  .userRole {
+    display: none;
+  }
+
+  .navItem {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .userInfo {
+    gap: 0;
+  }
+
+  .sidebarFooter {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .content {
+    padding: 20px 16px;
+  }
+}
