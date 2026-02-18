@@ -1,6 +1,13 @@
 const serverless = require("serverless-http");
 const app = require("../../server");
+const { connectDB } = require("../../server");
 
-// Wrap the Express app as a Netlify serverless function.
-// All requests to /api/* are routed here by netlify.toml.
-module.exports.handler = serverless(app);
+// Ensure MongoDB is connected before handling requests
+const handler = serverless(app);
+
+module.exports.handler = async (event, context) => {
+  // Reuse DB connection across warm invocations
+  context.callbackWaitsForEmptyEventLoop = false;
+  await connectDB();
+  return handler(event, context);
+};

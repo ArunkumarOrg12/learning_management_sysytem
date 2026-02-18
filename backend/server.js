@@ -17,15 +17,27 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// Trust proxy for production cookies
+// Trust proxy for production cookies (Netlify / Render)
 app.set("trust proxy", 1);
 
-// Middleware
+// CORS — allow configured client URL or localhost
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:3000",
+  "http://localhost:3000",
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. curl, Postman, serverless)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-  }),
+  })
 );
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -57,20 +69,33 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Connect to MongoDB & Start server
-const PORT = process.env.PORT || 5000;
+// Connect to MongoDB
+// In serverless mode (Netlify), we connect lazily per invocation.
+// In local dev mode, we start the HTTP server normally.
+let isConnected = false;
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+const connectDB = async () => {
+  if (isConnected) return;
+  await mongoose.connect(process.env.MONGO_URI);
+  isConnected = true;
+  console.log("✅ MongoDB connected");
+};
+
+// Only start the HTTP server when running locally (not as a serverless function)
+if (process.env.NODE_ENV !== "production" && require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error("❌ MongoDB connection error:", err.message);
+      process.exit(1);
     });
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1);
-  });
+}
 
+// Export app for serverless (Netlify Functions) and tests
 module.exports = app;
+module.exports.connectDB = connectDB;
